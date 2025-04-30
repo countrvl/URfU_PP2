@@ -33,8 +33,8 @@ def delete_resident(db: Session, resident_id: int):
     return resident
 
 # Создание парковочного места
-def create_parking_spot(db: Session, description: str):
-    spot = ParkingSpot(description=description, is_reserved=False)
+def create_parking_spot(db: Session, parking_spot_number: str, description: str):
+    spot = ParkingSpot(parking_spot_number=parking_spot_number, description=description, is_reserved=False)
     db.add(spot)
     db.commit()
     db.refresh(spot)

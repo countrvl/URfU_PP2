@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, BigInteger, String, Boolean, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -6,7 +6,7 @@ class Resident(Base):
     __tablename__ = "residents"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    tg_id = Column(Integer, unique=True, nullable=False)
+    tg_id = Column(BigInteger, unique=True, nullable=False)
     cars = relationship("Car", back_populates="owner")
     bookings = relationship("Booking", back_populates="resident")
 
@@ -20,6 +20,7 @@ class Car(Base):
 class ParkingSpot(Base):
     __tablename__ = "parking_spots"
     id = Column(Integer, primary_key=True, index=True)
+    parking_spot_number = Column(String, unique=True, index=True, nullable=False)
     description = Column(String, index=True)
     is_reserved = Column(Boolean, default=False)
     bookings = relationship("Booking", back_populates="spot")

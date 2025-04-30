@@ -55,11 +55,11 @@ async def remove_resident(resident_id: int, db: Session = Depends(get_db)):
 
 # CRUD для парковочных мест
 @router.post("/parking-spots")
-async def add_parking_spot(description: str, db: Session = Depends(get_db)):
+async def add_parking_spot(parking_spot_number: str, description: str, db: Session = Depends(get_db)):
     """
     Добавление нового парковочного места.
     """
-    spot = create_parking_spot(db, description)
+    spot = create_parking_spot(db, parking_spot_number, description)
     return {"message": "Parking spot added successfully", "spot": spot}
 
 @router.get("/parking-spots")

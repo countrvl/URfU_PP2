@@ -54,7 +54,7 @@ async def get_free_spots(db: Session = Depends(get_db)):
     Эндпоинт для получения свободных парковочных мест.
     """
     free_spots = get_free_parking_spots(db)
-    spots_list = [{"id": spot.id, "description": spot.description} for spot in free_spots]
+    spots_list = [{"id": spot.id, "parking_spot_number": spot.parking_spot_number, "description": spot.description} for spot in free_spots]
     return spots_list
 
 
