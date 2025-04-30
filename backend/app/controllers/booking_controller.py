@@ -18,7 +18,7 @@ def get_db():
         db.close()
 
 
-@router.post("/register", tags=["Registration"])
+@router.post("/register", tags=["Booking"])
 async def register_resident(tg_id: int, db: Session = Depends(get_db)):
     """
     Эндпоинт для регистрации жителя.
@@ -31,7 +31,7 @@ async def register_resident(tg_id: int, db: Session = Depends(get_db)):
     return {"message": "Resident registered successfully", "id": new_resident.id}
 
 
-@router.post("/register-car", tags=["Registration"])
+@router.post("/register-car", tags=["Booking"])
 async def register_car(tg_id: int, car_plate: str, db: Session = Depends(get_db)):
     """
     Эндпоинт для регистрации номера машины.
@@ -48,7 +48,7 @@ async def register_car(tg_id: int, car_plate: str, db: Session = Depends(get_db)
     return {"message": "Car registered successfully", "id": new_car.id}
 
 
-@router.get("/get-free-spots", tags=["Parking"])
+@router.get("/get-free-spots", tags=["Booking"])
 async def get_free_spots(db: Session = Depends(get_db)):
     """
     Эндпоинт для получения свободных парковочных мест.
