@@ -1,0 +1,10 @@
+# --- Telegram Bot Dependencies ---
+
+# Core bot framework (asynchronous)
+aiogram>=3.0.0b7  # Используем актуальную версию aiogram v3 (или укажите вашу)
+
+# For making asynchronous HTTP requests to the FastAPI API
+aiohttp>=3.8.0
+
+# (Опционально) Если вы будете использовать Pydantic напрямую для моделей данных в боте
+# pydantic>=1.10.0
