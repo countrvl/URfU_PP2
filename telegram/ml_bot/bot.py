@@ -1,16 +1,14 @@
-import asyncio
-import aiohttp
-import logging
 from typing import Optional, Dict, Any
-
-# --- Библиотека aiogram (для бота) ---
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message
+import asyncio
+import aiohttp
+import logging
+import os
 
-# --- Настройки Бота (Заменить 'xxxx' на реальный токен!) ---
-API_TOKEN = 'хххххх'  # <--- ВАЖНО: Заменить на реальный токен бота!
-API_ENDPOINT_URL = 'http://127.0.0.1:8000/recognize'
+API_TOKEN = os.getenv('TELEGRAM_BOT_BOOKING_API_KEY')
+API_ENDPOINT_URL = os.getenv('API_ENDPOINT_URL_ML')
 
 # --- Инициализация Бота и Диспетчера ---
 bot = Bot(token=API_TOKEN)
@@ -61,7 +59,7 @@ async def handle_photo(message: Message):
 
         # 2. Отправляем фото в API
         logging.info(f"Sending photo to API: {API_ENDPOINT_URL}")
-        api_response = await send_photo_to_api(photo_bytes, API_ENDPOINT_URL)
+        api_response = await send_photo_to_api(photo_bytes, API_ENDPOINT_URL + "/recognize-license-plate")
         logging.info(f"Received API response: {api_response}") # Логируем ответ API
 
         # 3. Обрабатываем ответ и отвечаем пользователю

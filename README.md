@@ -1,5 +1,13 @@
 # Parking Management System
-Parking Management System — это веб-приложение на базе FastAPI, которое позволяет управлять парковочными местами. Проект включает API для работы с базой данных PostgreSQL и предоставляет CRUD-операции через Swagger UI.
+Система распознавания автомобильных номеров — это веб-приложение на базе FastAPI, которое позволяет управлять парковочными местами. Проект включает API для работы с базой данных PostgreSQL и предоставляет CRUD-операции через Swagger UI. Также проект включает два телеграм-бота: один для распознавания автомобильных номеров и другой для бронирования парковочных мест.
+
+Основные возможности:
+* Регистрация и управление жителями.
+* Регистрация и управление автомобилями. 
+* Распознавание автомобильных номеров через телеграм-бота. 
+* Бронирование и управление парковочными местами. 
+* Просмотр свободных парковочных мест. 
+* Автоматическое управление шлагбаумом на основе распознавания номеров.
 
 ## Установка и запуск
 ### Предварительные требования 
@@ -15,3 +23,13 @@ cd URfU_PP2
 ```
 docker-compose up --build
 ```
+
+### ИСПОЛЬЗУЕМЫЕ ТЕХНОЛОГИИ: 
+<div align="left">
+  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/postgresql/postgresql-original-wordmark.svg" height="40" alt="javascript logo"  />
+  <img width="12" />
+  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" height="40" alt="typescript logo"  />
+  <img width="12" />
+</div>
+
+##
