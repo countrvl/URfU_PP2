@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Парковочные места</h2>
+<a href="/parking-spots/add" class="btn btn-success">Добавить парковочное место</a>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Номер места</th>
+            <th>Описание</th>
+            <th>Занято</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for spot in parking_spots %}
+        <tr>
+            <td>{{ spot.id }}</td>
+            <td>{{ spot.parking_spot_number }}</td>
+            <td>{{ spot.description }}</td>
+            <td>{{ 'Да' if spot.is_reserved else 'Нет' }}</td>
+            <td>
+                <a href="/parking-spots/{{ spot.id }}/edit" class="btn">Редактировать</a>
+                <form action="/parking-spots/{{ spot.id }}/delete" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if message %}
+<div class="alert alert-success">{{ message }}</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+<a href="/" class="btn">Назад</a>
+{% endblock %}

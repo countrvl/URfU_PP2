@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Добавление парковочного места</h2>
+<form action="/parking-spots/add" method="post" class="form-group">
+    <label for="parking_spot_number">Номер места:</label>
+    <input type="text" id="parking_spot_number" name="parking_spot_number" required>
+    <br>
+    <label for="description">Описание:</label>
+    <input type="text" id="description" name="description" required>
+    <br>
+    <button type="submit" class="btn btn-success">Добавить</button>
+</form>
+{% if message %}
+<div class="alert alert-success">{{ message }}</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+<a href="/parking-spots" class="btn">Назад</a>
+{% endblock %}
