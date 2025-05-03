@@ -6,7 +6,7 @@ from app.utils.database_utils import (
 )
 from app.db.database import SessionLocal
 
-router = APIRouter(prefix="/parking", tags=["Parking Management"])
+router = APIRouter(prefix="/parking", tags=["Модуль парковки"])
 
 # Dependency для получения сессии базы данных
 def get_db():
@@ -15,15 +15,6 @@ def get_db():
         yield db
     finally:
         db.close()
-
-# CRUD для жителей
-@router.post("/residents")
-async def add_resident(name: str, db: Session = Depends(get_db)):
-    """
-    Добавление нового жителя.
-    """
-    resident = create_resident(db, name)
-    return {"message": "Resident added successfully", "resident": resident}
 
 @router.get("/residents")
 async def view_residents(db: Session = Depends(get_db)):

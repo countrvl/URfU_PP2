@@ -3,12 +3,13 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from app.utils.database_utils import (
     create_resident, get_resident_by_tg_id, create_car, get_car_by_plate_and_owner,
-    get_free_parking_spots, create_booking, cancel_booking, get_resident_bookings
+    get_free_parking_spots, create_booking, cancel_booking, get_resident_bookings,
+    get_cars_by_tg_id
 )
 from app.db.database import SessionLocal
 from app.db.models import ParkingSpot
 
-router = APIRouter(prefix="/booking", tags=["Booking"])
+router = APIRouter(prefix="/booking", tags=["Модуль бронирования парковочного места"])
 
 def get_db():
     db = SessionLocal()
@@ -18,7 +19,7 @@ def get_db():
         db.close()
 
 
-@router.post("/register", tags=["Booking"])
+@router.post("/register")
 async def register_resident(tg_id: int, db: Session = Depends(get_db)):
     """
     Эндпоинт для регистрации жителя.
@@ -31,7 +32,7 @@ async def register_resident(tg_id: int, db: Session = Depends(get_db)):
     return {"message": "Resident registered successfully", "id": new_resident.id}
 
 
-@router.post("/register-car", tags=["Booking"])
+@router.post("/register-car")
 async def register_car(tg_id: int, car_plate: str, db: Session = Depends(get_db)):
     """
     Эндпоинт для регистрации номера машины.
@@ -48,7 +49,7 @@ async def register_car(tg_id: int, car_plate: str, db: Session = Depends(get_db)
     return {"message": "Car registered successfully", "id": new_car.id}
 
 
-@router.get("/get-free-spots", tags=["Booking"])
+@router.get("/get-free-spots")
 async def get_free_spots(db: Session = Depends(get_db)):
     """
     Эндпоинт для получения свободных парковочных мест.
@@ -58,7 +59,7 @@ async def get_free_spots(db: Session = Depends(get_db)):
     return spots_list
 
 
-@router.post("/reserve-parking", tags=["Booking"])
+@router.post("/reserve-parking")
 async def reserve_parking(tg_id: int, place_id: int, car_plate: str, start_time: float, end_time: float,
                           db: Session = Depends(get_db)):
     """
@@ -81,7 +82,7 @@ async def reserve_parking(tg_id: int, place_id: int, car_plate: str, start_time:
     return {"message": "Spot booked successfully", "booking_id": booking.id}
 
 
-@router.delete("/cancel-reservation/{reservation_id}", tags=["Booking"])
+@router.delete("/cancel-reservation/{reservation_id}")
 async def cancel_reservation(reservation_id: int, db: Session = Depends(get_db)):
     """
     Эндпоинт для снятия брони.
@@ -92,7 +93,7 @@ async def cancel_reservation(reservation_id: int, db: Session = Depends(get_db))
     return {"message": "Reservation canceled successfully"}
 
 
-@router.get("/view-reservations", tags=["Booking"])
+@router.get("/view-reservations")
 async def view_reservations(tg_id: int, db: Session = Depends(get_db)):
     """
     Эндпоинт для просмотра бронирований.
@@ -112,3 +113,15 @@ async def view_reservations(tg_id: int, db: Session = Depends(get_db)):
         } for booking in bookings
     ]
     return bookings_list
+
+
+# Получение всех автомобилей для конкретного жителя по tg_id
+@router.get("/residents/tg_id/{tg_id}/cars")
+async def get_resident_cars(tg_id: int, db: Session = Depends(get_db)):
+    """
+    Получение всех автомобилей для конкретного жителя по tg_id.
+    """
+    cars = get_cars_by_tg_id(db, tg_id)
+    if not cars:
+        raise HTTPException(status_code=404, detail="No cars found for this resident")
+    return {"cars": cars}

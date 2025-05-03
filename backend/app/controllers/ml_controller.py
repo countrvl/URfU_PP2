@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 
-router = APIRouter(prefix="/ml", tags=["Machine Learning"])
+router = APIRouter(prefix="/ml", tags=["ML-модуль"])
 
 @router.post("/detect-license-plate")
 async def detect_license_plate(file: UploadFile = File(...)):

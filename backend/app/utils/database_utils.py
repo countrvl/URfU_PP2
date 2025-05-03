@@ -77,6 +77,13 @@ def create_car(db: Session, resident_id: int, car_plate: str):
 def get_car_by_plate_and_owner(db: Session, car_plate: str, owner_id: int):
     return db.query(Car).filter(Car.car_plate == car_plate, Car.owner_id == owner_id).first()
 
+# Получение всех автомобилей для конкретного жителя по tg_id
+def get_cars_by_tg_id(db: Session, tg_id: int):
+    resident = get_resident_by_tg_id(db, tg_id)
+    if resident:
+        return resident.cars
+    return []
+
 # Получение всех парковочных мест
 def get_all_parking_spots(db: Session):
     return db.query(ParkingSpot).all()
