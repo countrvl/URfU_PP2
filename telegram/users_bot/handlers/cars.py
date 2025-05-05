@@ -2,7 +2,7 @@ import httpx
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
-from telegram.users_bot.common.constants import CMD_CARS
+from common.constants import CMD_CARS
 
 cars_router = Router()
 
@@ -11,7 +11,7 @@ async def view_cars_handler(message: Message) -> None:
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"http://localhost:8000/booking/residents/tg_id/{message.from_user.id}/cars"
+                f"http://backend:8000/booking/residents/tg_id/{message.from_user.id}/cars"
             )
             
             if response.status_code == 200:

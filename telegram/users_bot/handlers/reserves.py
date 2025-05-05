@@ -8,12 +8,11 @@ from aiogram.types import Message
 from aiogram import html
 import re
 from datetime import datetime
-import time
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from spots import get_spots, format_spots
-from telegram.users_bot.common.constants import CMD_RESERVE, CALLBACK_RESERVE, CMD_VIEW_RESERVATIONS, CALLBACK_CANCEL_RESERVATION
-from telegram.users_bot.common.base import ru_car_plate_pattern
+from handlers.spots import get_spots, format_spots
+from common.constants import CMD_RESERVE, CALLBACK_RESERVE, CMD_VIEW_RESERVATIONS, CALLBACK_CANCEL_RESERVATION
+from common.base import ru_car_plate_pattern
 
 reserves_router = Router()
 
@@ -173,7 +172,7 @@ async def process_end_time(message: Message, state: FSMContext) -> None:
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"http://localhost:8000/booking/reserve-parking?tg_id={message.from_user.id}&place_id={spot_id}&car_plate={car_plate}&start_time={start_timestamp}&end_time={end_timestamp}"
+                f"http://backend:8000/booking/reserve-parking?tg_id={message.from_user.id}&place_id={spot_id}&car_plate={car_plate}&start_time={start_timestamp}&end_time={end_timestamp}"
             )
             await state.clear()
             if response.status_code == 200:
@@ -195,7 +194,7 @@ async def view_reservations_handler(message: Message, state: FSMContext) -> None
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"http://localhost:8000/booking/view-reservations?tg_id={message.from_user.id}"
+                f"http://backend:8000/booking/view-reservations?tg_id={message.from_user.id}"
             )
             
             if response.status_code == 200:
@@ -277,7 +276,7 @@ async def process_cancel_spot_number(message: Message, state: FSMContext) -> Non
     try:
         async with httpx.AsyncClient() as client:
             response = await client.delete(
-                f"http://localhost:8000/booking/cancel-reservation/{reservation_id}"
+                f"http://backend:8000/booking/cancel-reservation/{reservation_id}"
             )
             
             if response.status_code == 200:

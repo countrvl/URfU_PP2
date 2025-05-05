@@ -26,13 +26,13 @@ services:
       - .env
     command: python bot.py
 
-  booking-bot:
-    build: ./telegram/booking_bot
+  users-bot:
+    build: ./telegram/users_bot
     depends_on:
       - backend
     env_file:
       - .env
-    command: python bot.py
+    command: python main.py
 
 volumes:
   postgres_data:

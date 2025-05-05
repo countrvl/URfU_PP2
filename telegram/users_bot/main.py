@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import sys
-from os import getenv, environ
+import os
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -14,17 +14,7 @@ from handlers.spots import spots_router
 from handlers.start import start_router
 from handlers.cars import cars_router
 
-
-def load_env_file(filepath=".env"):
-    with open(filepath) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith("#"):
-                key, value = line.split("=", 1)
-                environ[key.strip()] = value.strip()
-
-load_env_file()
-TOKEN = getenv("BOT_TOKEN")
+TOKEN = os.getenv("TELEGRAM_BOT_BOOKING_API_KEY")
 
 dp = Dispatcher()
 dp.include_routers(

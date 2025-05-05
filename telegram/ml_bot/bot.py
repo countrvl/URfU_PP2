@@ -7,7 +7,7 @@ import aiohttp
 import logging
 import os
 
-API_TOKEN = os.getenv('TELEGRAM_BOT_BOOKING_API_KEY')
+API_TOKEN = os.getenv('TELEGRAM_BOT_ML_API_KEY')
 API_ENDPOINT_URL = os.getenv('API_ENDPOINT_URL_ML')
 
 # --- Инициализация Бота и Диспетчера ---

@@ -1,5 +1,5 @@
-from telegram.users_bot.common.constants import CMD_REGISTER, CMD_REGISTER_CAR
-from telegram.users_bot.common.base import ru_car_plate_pattern
+from common.constants import CMD_REGISTER, CMD_REGISTER_CAR
+from common.base import ru_car_plate_pattern
 import httpx
 from aiogram import Router
 from aiogram.filters import Command
@@ -18,7 +18,7 @@ class CarRegistration(StatesGroup):
 async def register_handler(message: Message) -> None:
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.post(f"http://localhost:8000/booking/register?tg_id={message.from_user.id}")
+            response = await client.post(f"http://backend:8000/booking/register?tg_id={message.from_user.id}")
             if response.status_code == 200:
                 await message.answer("Вы успешно зарегистрированы!")
             elif response.status_code == 400:
@@ -51,7 +51,7 @@ async def process_car_plate(message: Message, state: FSMContext) -> None:
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(
-                f"http://localhost:8000/booking/register-car?tg_id={message.from_user.id}&car_plate={car_plate}")
+                f"http://backend:8000/booking/register-car?tg_id={message.from_user.id}&car_plate={car_plate}")
             if response.status_code == 200:
                 await message.answer("Автомобиль успешно зарегистрирован!")
             elif response.status_code == 400:

@@ -2,7 +2,7 @@ import httpx
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.users_bot.common.constants import CMD_SPOTS, CALLBACK_RESERVE
+from common.constants import CMD_SPOTS, CALLBACK_RESERVE
 
 spots_router = Router()
 
@@ -37,7 +37,7 @@ async def get_spots_handler(message: Message) -> None:
 async def get_spots():
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.get("http://localhost:8000/booking/get-free-spots")
+            response = await client.get("http://backend:8000/booking/get-free-spots")
             if response.status_code == 200:
                 spots_data = response.json()
                 return spots_data

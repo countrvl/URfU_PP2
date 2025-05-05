@@ -1,7 +1,7 @@
 from aiogram import Bot
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
-from constants import COMMANDS_DESCRIPTION
+from common.constants import COMMANDS_DESCRIPTION
 
 async def _set_commands(bot: Bot):
     commands = [ BotCommand(command=cmd, description=desc) for cmd, desc in COMMANDS_DESCRIPTION.items() ]
