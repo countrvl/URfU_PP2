@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 data/**/ann/*.json
+data/test/ann/*.json
 
 # C extensions
 *.so
