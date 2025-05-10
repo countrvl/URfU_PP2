@@ -10,14 +10,21 @@ def create_resident(db: Session, tg_id: int):
     db.refresh(resident)
     return resident
 
+# Создание жителя с именем
+def create_resident_by_name(db: Session, tg_id: int, name: str):
+    resident = Resident(tg_id=tg_id, name=name)
+    db.add(resident)
+    db.commit()
+    db.refresh(resident)
+    return resident
 
 # Получение всех жителей
 def get_all_residents(db: Session):
     return db.query(Resident).all()
 
 # Обновление имени жителя
-def update_resident(db: Session, resident_id: int, new_name: str):
-    resident = db.query(Resident).filter(Resident.id == resident_id).first()
+def update_resident(db: Session, tg_id: int, new_name: str):
+    resident = db.query(Resident).filter(Resident.tg_id == tg_id).first()
     if resident:
         resident.name = new_name
         db.commit()
@@ -25,8 +32,8 @@ def update_resident(db: Session, resident_id: int, new_name: str):
     return resident
 
 # Удаление жителя
-def delete_resident(db: Session, resident_id: int):
-    resident = db.query(Resident).filter(Resident.id == resident_id).first()
+def delete_resident(db: Session, tg_id: int):
+    resident = db.query(Resident).filter(Resident.tg_id == tg_id).first()
     if resident:
         db.delete(resident)
         db.commit()
