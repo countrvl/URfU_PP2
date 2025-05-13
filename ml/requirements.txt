@@ -1,0 +1,13 @@
+easyocr==1.7.2
+matplotlib==3.10.3
+numpy==2.2.5
+opencv-python==4.11.0.86
+opencv-python-headless==4.10.0.8
+pandas==2.2.3
+roboflow==1.1.63
+scikit-image==0.25.2
+scipy==1.15.3
+seaborn==0.13.2
+torch==2.7.0+cu126
+torchvision==0.22.0+cu126
+ultralytics==8.3.133
