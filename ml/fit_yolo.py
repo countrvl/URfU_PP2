@@ -2,8 +2,6 @@ import cv2
 import torch
 from ultralytics import YOLO  # Используем YOLOv8 для детекции объектов
 import easyocr  # Библиотека для распознавания текста
-import os
-import numpy as np
 from roboflow import Roboflow
 
 rf = Roboflow(api_key="5pXFfA6Z3uRGVkNdeUMD")
