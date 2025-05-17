@@ -16,8 +16,7 @@ logger = logging.getLogger(__name__)
 # Конфигурация
 API_TOKEN = os.getenv('TELEGRAM_BOT_ML_API_KEY')
 API_ENDPOINT_URL = os.getenv('API_ENDPOINT_URL_ML')
-DETECT_URL = f"{API_ENDPOINT_URL}/ml/detect-license-plate"
-RECOGNIZE_URL = f"{API_ENDPOINT_URL}/ml/recognize-license-plate"
+RECOGNIZE_URL = f"http://backend:8000/ml/recognize-license-plate"
 
 # Проверка токена
 if not API_TOKEN:
