@@ -1,6 +1,5 @@
 import os
 import logging
-import random
 import asyncio
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
@@ -17,6 +16,8 @@ logger = logging.getLogger(__name__)
 # Конфигурация
 API_TOKEN = os.getenv('TELEGRAM_BOT_ML_API_KEY')
 API_ENDPOINT_URL = os.getenv('API_ENDPOINT_URL_ML')
+DETECT_URL = f"{API_ENDPOINT_URL}/ml/detect-license-plate"
+RECOGNIZE_URL = f"{API_ENDPOINT_URL}/ml/recognize-license-plate"
 
 # Проверка токена
 if not API_TOKEN:
@@ -38,14 +39,28 @@ start_keyboard = ReplyKeyboardMarkup(
 )
 
 
-# --- Заглушка для ML-распознавания ---
-async def mock_ml_api(image_bytes: bytes) -> bool:
-    """Имитация работы ML-API (50% успеха)"""
-    logger.info("Mock ML API called (image size: %d bytes)", len(image_bytes))
-    await asyncio.sleep(2)  # Имитация задержки сети
-    result = random.choice([True, False])
-    logger.info("Mock ML API result: %s", result)
-    return result
+# --- Реальная интеграция с ML API ---
+async def call_ml_api(image_bytes: bytes, endpoint_url: str):
+    """Отправляет изображение в указанный API-эндпоинт"""
+    logger.info("ML API called (image size: %d bytes)", len(image_bytes))
+    try:
+        async with aiohttp.ClientSession() as session:
+            data = aiohttp.FormData()
+            data.add_field('file',
+                           image_bytes,
+                           filename='image.jpg',
+                           content_type='image/jpeg')
+            async with session.post(endpoint_url, data=data) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    logger.info("ML API response: %s", result)
+                    return result
+                else:
+                    logger.error("ML API returned error: %d", response.status)
+                    return None
+    except Exception as e:
+        logger.exception("Network error while calling ML API:")
+        return None
 
 
 # --- Обработчики сообщений ---
@@ -88,15 +103,16 @@ async def handle_car_photo(message: types.Message):
 
         logger.info("Photo downloaded, size: %d bytes", len(image_bytes))
 
-        # Используем заглушку
-        is_recognized = await mock_ml_api(image_bytes)
-
-        if is_recognized:
-            response = "✅ Автомобиль распознан! Шлагбаум открыт."
+        # === 2. Распознавание текста на номерном знаке (recognize) ===
+        recognize_result = await call_ml_api(image_bytes, RECOGNIZE_URL)
+        if recognize_result and "license_plate" in recognize_result:
+            plate_number = recognize_result["license_plate"]
+            confidence = recognize_result["confidence"]
+            await message.reply(f"🔢 Номер: `{plate_number}` (уверенность: {confidence:.2f})", reply_markup=start_keyboard)
+        elif recognize_result and "message" in recognize_result:
+            await message.reply(f"❌ Не распознано: {recognize_result['message']}", reply_markup=start_keyboard)
         else:
-            response = "❌ Автомобиль не распознан. Доступ закрыт."
-
-        await message.reply(response, reply_markup=start_keyboard)
+            await message.reply("⚠️ Ошибка при распознавании номерного знака.", reply_markup=start_keyboard)
 
     except Exception as e:
         logger.exception("Error processing photo:")
