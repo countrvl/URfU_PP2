@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from ultralytics import YOLO
 from app.db.database import init_db
 from app.controllers.ml_controller import router as ml_router
 from app.controllers.booking_controller import router as booking_router
@@ -13,6 +14,8 @@ app = FastAPI(
 @app.on_event("startup")
 def on_startup():
     init_db()
+    global model
+    model = YOLO('./ml/runs/detect/train/weights/best.pt')
 
 
 app.include_router(ml_router)
