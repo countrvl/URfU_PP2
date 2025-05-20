@@ -2,10 +2,11 @@ from fastapi import APIRouter, UploadFile, File
 import cv2
 from ultralytics import YOLO
 import tempfile
+import easyocr
 
 model = YOLO("/app/best.pt")
 
-def detect_license_plate(image_path, model):
+def detect_license_plate_func(image_path, model):
     image = cv2.imread(image_path)
     results = model(image)
     for result in results:
@@ -17,7 +18,7 @@ def detect_license_plate(image_path, model):
     return None
 
 def preprocess_license_plate(image, bbox):
-    x1, y1, x2, y2 = bbox
+    x1, y1, x2, y2, _ = bbox
     plate_image = image[y1:y2, x1:x2]
     gray = cv2.cvtColor(plate_image, cv2.COLOR_BGR2GRAY)
     _, thresholded = cv2.threshold(gray, 64, 255, cv2.THRESH_BINARY_INV)
@@ -41,7 +42,7 @@ async def detect_license_plate(file: UploadFile = File(...)):
         temp_file.write(await file.read())
         temp_file_path = temp_file.name
 
-    bbox = detect_license_plate(temp_file_path, model)
+    bbox = detect_license_plate_func(temp_file_path, model)
     if bbox is None:
         return {"message": "Номерной знак не найден"}
 
@@ -58,7 +59,7 @@ async def recognize_license_plate(file: UploadFile = File(...)):
         temp_file.write(await file.read())
         temp_file_path = temp_file.name
 
-    bbox = detect_license_plate(temp_file_path, model)
+    bbox = detect_license_plate_func(temp_file_path, model)
     if bbox is None:
         return {"message": "Номерной знак не найден"}
 
