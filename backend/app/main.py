@@ -15,7 +15,7 @@ app = FastAPI(
 def on_startup():
     init_db()
     global model
-    model = YOLO('./ml/runs/detect/train/weights/best.pt')
+    model = YOLO('best.pt')
 
 
 app.include_router(ml_router)

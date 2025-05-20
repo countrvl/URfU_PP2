@@ -2,9 +2,8 @@ from fastapi import APIRouter, UploadFile, File
 import cv2
 from ultralytics import YOLO
 import tempfile
-import easyocr
 
-model = YOLO('./ml/runs/detect/train/weights/best.pt')
+model = YOLO("/app/best.pt")
 
 def detect_license_plate(image_path, model):
     image = cv2.imread(image_path)
