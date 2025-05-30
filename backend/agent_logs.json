@@ -1,0 +1,32 @@
+[
+  {
+    "timestamp": "2025-05-30 19:46:54",
+    "type": "ERROR",
+    "message": "README.md не найден"
+  },
+  {
+    "timestamp": "2025-05-30 19:47:31",
+    "type": "MONITOR",
+    "message": "[{\"id\": \"c53f8b324fc0\", \"name\": \"open-webui\", \"status\": \"Up 21 minutes (healthy)\"}]"
+  },
+  {
+    "timestamp": "2025-05-30 19:47:49",
+    "type": "ERROR",
+    "message": "Ошибка при деплое: [Errno 2] No such file or directory: 'docker-compose'"
+  },
+  {
+    "timestamp": "2025-05-30 19:48:09",
+    "type": "ERROR",
+    "message": "README.md не найден"
+  },
+  {
+    "timestamp": "2025-05-30 19:48:11",
+    "type": "ERROR",
+    "message": "Ошибка при деплое: [Errno 2] No such file or directory: 'docker-compose'"
+  },
+  {
+    "timestamp": "2025-05-30 19:48:12",
+    "type": "MONITOR",
+    "message": "[{\"id\": \"c53f8b324fc0\", \"name\": \"open-webui\", \"status\": \"Up 21 minutes (healthy)\"}]"
+  }
+]
