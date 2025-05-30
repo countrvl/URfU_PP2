@@ -1,119 +1,133 @@
-import os
+import sys
+import logging
 import subprocess
 import json
 import time
-import requests
 
-# Корень проекта - два уровня выше utils
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
-OLLAMA_API_URL = "http://ollama:11434"
-LOG_FILE = os.path.join(PROJECT_ROOT, "agent_logs.json")
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] [%(levelname)s] %(message)s'
+)
+
+LOG_PATH = "agent_logs.json"
 
 def log_event(event_type, message):
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    entry = {"timestamp": timestamp, "type": event_type, "message": message}
-    print(f"[{timestamp}] [{event_type}] {message}")
-    if os.path.exists(LOG_FILE):
-        with open(LOG_FILE, "r", encoding="utf-8") as f:
-            logs = json.load(f)
-    else:
-        logs = []
-    logs.append(entry)
-    with open(LOG_FILE, "w", encoding="utf-8") as f:
-        json.dump(logs, f, indent=2, ensure_ascii=False)
-
-def analyze_project():
-    readme_path = os.path.join(PROJECT_ROOT, "README.md")
-    if not os.path.isfile(readme_path):
-        log_event("ERROR", "README.md не найден")
-        return
-
-    with open(readme_path, "r", encoding="utf-8") as f:
-        readme_text = f.read()
-
-    structure = []
-    for root, dirs, files in os.walk(PROJECT_ROOT):
-        rel_root = os.path.relpath(root, PROJECT_ROOT)
-        structure.append({"path": rel_root, "dirs": dirs, "files": files})
-
-    prompt = (
-        "Проект описан следующим образом:\n"
-        f"{readme_text}\n\n"
-        "Структура каталогов и файлов:\n"
-        f"{json.dumps(structure, indent=2, ensure_ascii=False)}\n\n"
-        "Проанализируй проект, укажи ключевые моменты для успешного деплоя и потенциальные проблемы."
-    )
-
+    entry = {"time": time.strftime("%Y-%m-%d %H:%M:%S"), "type": event_type, "message": message}
     try:
-        response = requests.post(
-            f"{OLLAMA_API_URL}/chat",
-            json={"model": "llama2", "prompt": prompt},
+        with open(LOG_PATH, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except Exception as e:
+        logging.error(f"Ошибка записи лога: {e}")
+
+def ask_llm(prompt: str) -> str | None:
+    try:
+        process = subprocess.run(
+            ["ollama", "run", "mistral"],
+            input=prompt.encode("utf-8"),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             timeout=30,
         )
-        response.raise_for_status()
-        result = response.json()
-        analysis = result.get("response", "Нет ответа от LLM")
-        log_event("ANALYSIS", analysis)
-        print("\n--- Анализ проекта ---")
-        print(analysis)
+        if process.returncode != 0:
+            err = process.stderr.decode("utf-8").strip()
+            logging.error(f"Ollama error: {err}")
+            log_event("ERROR", f"Ollama error: {err}")
+            return None
+        output = process.stdout.decode("utf-8").strip()
+        return output
     except Exception as e:
-        log_event("ERROR", f"Ошибка при запросе к LLM: {e}")
+        logging.error(f"Ошибка при вызове ollama: {e}")
+        log_event("ERROR", f"Ошибка при вызове ollama: {e}")
+        return None
 
-def run_docker_compose():
+def analyze_project():
+    logging.info("Запрос к LLM для анализа проекта...")
+    prompt = (
+        "Проанализируй проект в текущей директории (структура, основные файлы и функции). "
+        "Дай краткий отчёт, упомяни README.md, docker-compose.yml и backend."
+    )
+    response = ask_llm(prompt)
+    if response:
+        logging.info(f"Ответ LLM:\n{response}")
+        log_event("ANALYZE", response)
+    else:
+        logging.error("Не удалось получить ответ от LLM")
+        log_event("ERROR", "Не удалось получить ответ от LLM")
+
+def deploy_project():
+    logging.info("Запуск деплоя через docker compose up --build -d...")
     try:
-        cmd = ["docker-compose", "-f", os.path.join(PROJECT_ROOT, "docker-compose.yml"), "up", "-d", "--build"]
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-        log_event("DEPLOY_STDOUT", proc.stdout)
-        log_event("DEPLOY_STDERR", proc.stderr)
-        if proc.returncode == 0:
-            log_event("DEPLOY", "Деплой выполнен успешно")
-            print("Деплой выполнен успешно")
+        result = subprocess.run(
+            ["docker", "compose", "up", "--build", "-d"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=300,
+        )
+        logging.info(f"DEPLOY STDOUT:\n{result.stdout}")
+        if result.stderr:
+            logging.error(f"DEPLOY STDERR:\n{result.stderr}")
+        log_event("DEPLOY_STDOUT", result.stdout)
+        if result.stderr:
+            log_event("DEPLOY_STDERR", result.stderr)
+        if result.returncode == 0:
+            logging.info("Деплой завершён успешно.")
+            log_event("DEPLOY", "Деплой завершён успешно.")
         else:
-            log_event("ERROR", f"Деплой завершился с ошибкой (код {proc.returncode})")
-            print(f"Ошибка деплоя, код: {proc.returncode}")
+            logging.error(f"Деплой завершился с ошибкой, код {result.returncode}")
+            log_event("ERROR", f"Деплой завершился с ошибкой, код {result.returncode}")
     except Exception as e:
+        logging.error(f"Ошибка при деплое: {e}")
         log_event("ERROR", f"Ошибка при деплое: {e}")
 
-def check_containers():
+def monitor_containers():
+    logging.info("Проверка статуса docker-контейнеров...")
     try:
-        cmd = ["docker", "ps", "-a", "--format", "{{.ID}} {{.Names}} {{.Status}}"]
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-        if proc.returncode != 0:
-            log_event("ERROR", f"Ошибка проверки контейнеров: {proc.stderr}")
-            print("Ошибка при проверке контейнеров")
+        result = subprocess.run(
+            ["docker", "ps", "--format", "{{json .}}"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=60,
+        )
+        if result.returncode != 0:
+            logging.error(f"Ошибка docker ps: {result.stderr}")
+            log_event("ERROR", f"Ошибка docker ps: {result.stderr}")
             return
 
-        print("\n--- Статус контейнеров ---")
-        containers = []
-        for line in proc.stdout.strip().split("\n"):
-            cid, name, status = line.split(maxsplit=2)
-            containers.append({"id": cid, "name": name, "status": status})
-            print(f"{name}: {status}")
-        log_event("MONITOR", json.dumps(containers, ensure_ascii=False))
-
-        for c in containers:
-            if "Exited" in c["status"] or "Restarting" in c["status"]:
-                print(f"Рестарт контейнера {c['name']}")
-                subprocess.run(["docker", "restart", c["id"]])
-                log_event("SELF_HEALING", f"Рестарт контейнера {c['name']}")
-
+        containers = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
+        status_summary = [
+            {"id": c.get("ID"), "name": c.get("Names"), "status": c.get("Status")}
+            for c in containers
+        ]
+        logging.info(f"Контейнеры:\n{status_summary}")
+        log_event("MONITOR", json.dumps(status_summary, ensure_ascii=False))
     except Exception as e:
-        log_event("ERROR", f"Ошибка мониторинга: {e}")
+        logging.error(f"Ошибка при мониторинге контейнеров: {e}")
+        log_event("ERROR", f"Ошибка при мониторинге контейнеров: {e}")
 
 def show_report():
-    if not os.path.isfile(LOG_FILE):
-        print("Логи отсутствуют")
-        return
+    logging.info("--- Отчёт агента ---")
+    try:
+        with open(LOG_PATH, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                    print(f"[{entry['time']}] [{entry['type']}] {entry['message']}")
+                except json.JSONDecodeError as e:
+                    logging.error(f"Ошибка декодирования JSON в логе: {e} - Строка: {line}")
+    except FileNotFoundError:
+        logging.info("Отчёт пуст. Логов ещё нет.")
+    except Exception as e:
+        logging.error(f"Ошибка при чтении отчёта: {e}")
 
-    with open(LOG_FILE, "r", encoding="utf-8") as f:
-        logs = json.load(f)
-
-    print("\n--- Отчёт агента ---")
-    for entry in logs[-20:]:
-        print(f"[{entry['timestamp']}] [{entry['type']}] {entry['message']}")
 
 def main():
-    print("=== AI-Агент по заданию ===")
+    logging.info("=== AI-Агент по заданию ===")
+
     while True:
         print(
             "\nДоступные команды:\n"
@@ -121,22 +135,23 @@ def main():
             "2. deploy  - Запустить деплой\n"
             "3. monitor - Проверить контейнеры и self-healing\n"
             "4. report  - Показать отчёт\n"
-            "5. exit    - Выход\n"
+            "5. exit    - Выход"
         )
         cmd = input("Введите команду: ").strip().lower()
-        if cmd == "analyze":
+
+        if cmd in ("1", "analyze"):
             analyze_project()
-        elif cmd == "deploy":
-            run_docker_compose()
-        elif cmd == "monitor":
-            check_containers()
-        elif cmd == "report":
+        elif cmd in ("2", "deploy"):
+            deploy_project()
+        elif cmd in ("3", "monitor"):
+            monitor_containers()
+        elif cmd in ("4", "report"):
             show_report()
-        elif cmd == "exit":
-            print("Выход...")
-            break
+        elif cmd in ("5", "exit"):
+            logging.info("Выход...")
+            sys.exit(0)
         else:
-            print("Неизвестная команда")
+            logging.info("Неизвестная команда")
 
 if __name__ == "__main__":
     main()

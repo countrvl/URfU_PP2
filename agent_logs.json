@@ -1,0 +1,52 @@
+[
+  {
+    "timestamp": "2025-05-30 19:53:01",
+    "type": "ERROR",
+    "message": "Ошибка при запросе к LLM: HTTPConnectionPool(host='ollama', port=11434): Max retries exceeded with url: /chat (Caused by NameResolutionError(\"<urllib3.connection.HTTPConnection object at 0x7e6cda3ed880>: Failed to resolve 'ollama' ([Errno -3] Temporary failure in name resolution)\"))"
+  },
+  {
+    "timestamp": "2025-05-30 19:53:14",
+    "type": "DEPLOY_STDOUT",
+    "message": ""
+  },
+  {
+    "timestamp": "2025-05-30 19:53:14",
+    "type": "DEPLOY_STDERR",
+    "message": "time=\"2025-05-30T19:53:14+03:00\" level=warning msg=\"The \\\"POSTGRES_USER\\\" variable is not set. Defaulting to a blank string.\"\ntime=\"2025-05-30T19:53:14+03:00\" level=warning msg=\"The \\\"POSTGRES_PASSWORD\\\" variable is not set. Defaulting to a blank string.\"\ntime=\"2025-05-30T19:53:14+03:00\" level=warning msg=\"The \\\"POSTGRES_DB\\\" variable is not set. Defaulting to a blank string.\"\nenv file /home/count/code/URfU_PP2/.env not found: stat /home/count/code/URfU_PP2/.env: no such file or directory\n"
+  },
+  {
+    "timestamp": "2025-05-30 19:53:14",
+    "type": "ERROR",
+    "message": "Деплой завершился с ошибкой (код 14)"
+  },
+  {
+    "timestamp": "2025-05-30 19:53:18",
+    "type": "MONITOR",
+    "message": "[{\"id\": \"c53f8b324fc0\", \"name\": \"open-webui\", \"status\": \"Up 26 minutes (healthy)\"}]"
+  },
+  {
+    "timestamp": "2025-05-30 19:54:03",
+    "type": "ERROR",
+    "message": "Ошибка при запросе к LLM: 404 Client Error: Not Found for url: http://localhost:11434/chat"
+  },
+  {
+    "timestamp": "2025-05-30 19:54:36",
+    "type": "DEPLOY_STDOUT",
+    "message": ""
+  },
+  {
+    "timestamp": "2025-05-30 19:54:36",
+    "type": "DEPLOY_STDERR",
+    "message": "time=\"2025-05-30T19:54:36+03:00\" level=warning msg=\"The \\\"POSTGRES_USER\\\" variable is not set. Defaulting to a blank string.\"\ntime=\"2025-05-30T19:54:36+03:00\" level=warning msg=\"The \\\"POSTGRES_PASSWORD\\\" variable is not set. Defaulting to a blank string.\"\ntime=\"2025-05-30T19:54:36+03:00\" level=warning msg=\"The \\\"POSTGRES_DB\\\" variable is not set. Defaulting to a blank string.\"\nenv file /home/count/code/URfU_PP2/.env not found: stat /home/count/code/URfU_PP2/.env: no such file or directory\n"
+  },
+  {
+    "timestamp": "2025-05-30 19:54:36",
+    "type": "ERROR",
+    "message": "Деплой завершился с ошибкой (код 14)"
+  },
+  {
+    "timestamp": "2025-05-30 19:54:38",
+    "type": "MONITOR",
+    "message": "[{\"id\": \"c53f8b324fc0\", \"name\": \"open-webui\", \"status\": \"Up 28 minutes (healthy)\"}]"
+  }
+]
